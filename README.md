@@ -10,7 +10,7 @@ A React Native CLI application that integrates with TMDB and includes:
 
 ## Setup
 
-1. Install dependencies:
+1. Install dependencies (this also restores required native binary assets locally via `postinstall`):
 
    ```bash
    npm install
@@ -37,6 +37,46 @@ A React Native CLI application that integrates with TMDB and includes:
    # or
    npm run ios
    ```
+
+## Troubleshooting
+
+### `error Android project not found`
+This happens when the `android/` native folder is missing. This repository now includes the native Android project under `android/`, so make sure you are running commands from the project root.
+
+### `error No Metro config found`
+This happens when `metro.config.js` is missing. This repository now includes a valid `metro.config.js` in the root.
+
+
+### `Binary files are not supported` while opening/creating PR
+Some Git hosting UIs reject PRs containing binary blobs (for example launcher PNGs, debug keystore, or Gradle wrapper JAR).
+
+This repository now keeps those files **out of Git** and restores them automatically after `npm install` using:
+
+```bash
+npm run postinstall
+```
+
+If needed manually, run:
+
+```bash
+node scripts/restore-binary-assets.js
+```
+
+### npm deprecation warnings
+Warnings like `deprecated inflight`, `deprecated rimraf`, or `@types/react-native` are transitive dependency warnings from upstream packages and do not block install if npm exits successfully.
+
+### Android build prerequisites (Windows)
+`npm run android` requires Android SDK + Java configured:
+
+- `ANDROID_HOME` set (usually `C:\Users\<you>\AppData\Local\Android\Sdk`)
+- `JAVA_HOME` set (JDK 17 recommended)
+- `%ANDROID_HOME%\platform-tools` added to `PATH`
+
+Run diagnostics:
+
+```bash
+npx react-native doctor
+```
 
 ## Notes
 
