@@ -62,6 +62,29 @@ If needed manually, run:
 node scripts/restore-binary-assets.js
 ```
 
+### Metro watcher warnings (`unstable_lazySha1` / `unstable_autoSaveCache`)
+If Metro prints watcher option warnings, the project now strips unsupported watcher flags in `metro.config.js` to avoid schema mismatches between Metro/CLI packages.
+
+After pulling latest changes, restart Metro with cache reset:
+
+```bash
+npm run start -- --reset-cache
+```
+
+### Gradle error: `Could not move temporary workspace ... dependencies-accessors`
+This is usually a local file-lock/cache issue (often from repeated concurrent Android run attempts, antivirus/indexer locks, or stale Gradle state).
+
+Try this exact sequence:
+
+```bash
+npm run android:reset
+cd android && gradlew --stop
+cd ..
+npm run android
+```
+
+Also avoid pressing `a` multiple times while an install is already in progress.
+
 ### API key errors (401 / request failing)
 In React Native CLI, `.env` variables are now loaded through Babel (`react-native-dotenv`).
 

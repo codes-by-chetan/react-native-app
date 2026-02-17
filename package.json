@@ -8,7 +8,8 @@
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "postinstall": "node scripts/restore-binary-assets.js"
+    "postinstall": "node scripts/restore-binary-assets.js",
+    "android:reset": "node scripts/reset-android-gradle.js"
   },
   "dependencies": {
     "@react-navigation/native": "^6.1.18",
