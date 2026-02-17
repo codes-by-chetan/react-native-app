@@ -1,0 +1,13 @@
+node_modules/
+android/.gradle/
+ios/Pods/
+ios/build/
+android/build/
+.env
+*.log
+.DS_Store
+# Generated locally after npm install (kept out of PRs to avoid binary diff restrictions)
+android/app/debug.keystore
+android/gradle/wrapper/gradle-wrapper.jar
+android/app/src/main/res/mipmap-*/ic_launcher.png
+android/app/src/main/res/mipmap-*/ic_launcher_round.png
