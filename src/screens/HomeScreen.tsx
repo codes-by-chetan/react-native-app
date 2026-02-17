@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -24,36 +24,39 @@ export const HomeScreen = ({navigation}: Props) => {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const isFetchingRef = useRef(false);
 
   const canLoadMore = useMemo(() => !loading && page < totalPages, [loading, page, totalPages]);
 
-  const fetchPopular = useCallback(
-    async (targetPage: number, replace = false) => {
-      if (loading) {
-        return;
-      }
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await tmdbApi.getPopularMovies(targetPage);
-        setPage(response.page);
-        setTotalPages(response.total_pages);
-        setMovies(prev => {
-          if (replace || targetPage === 1) {
-            return response.results;
-          }
-          const ids = new Set(prev.map(item => item.id));
-          const unique = response.results.filter(item => !ids.has(item.id));
-          return [...prev, ...unique];
-        });
-      } catch (err) {
-        setError('Failed to load popular movies.');
-      } finally {
-        setLoading(false);
-      }
-    },
-    [loading],
-  );
+  const fetchPopular = useCallback(async (targetPage: number, replace = false) => {
+    if (isFetchingRef.current) {
+      return;
+    }
+
+    isFetchingRef.current = true;
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await tmdbApi.getPopularMovies(targetPage);
+      setPage(response.page);
+      setTotalPages(response.total_pages);
+      setMovies(prev => {
+        if (replace || targetPage === 1) {
+          return response.results;
+        }
+        const ids = new Set(prev.map(item => item.id));
+        const unique = response.results.filter(item => !ids.has(item.id));
+        return [...prev, ...unique];
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to load popular movies.';
+      setError(message);
+    } finally {
+      isFetchingRef.current = false;
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     fetchPopular(1, true);

@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {ActivityIndicator, FlatList, StyleSheet, Text, View} from 'react-native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {MovieCard} from '../components/MovieCard';
@@ -19,35 +19,47 @@ export const SearchScreen = ({navigation}: Props) => {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const isSearchingRef = useRef(false);
 
-  const runSearch = useCallback(
-    async (searchTerm: string, targetPage = 1, replace = true) => {
-      if (!searchTerm.trim() || loading) {
-        return;
-      }
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await tmdbApi.searchMovies(searchTerm.trim(), targetPage);
-        setPage(response.page);
-        setTotalPages(response.total_pages);
-        setResults(prev => (replace ? response.results : [...prev, ...response.results]));
-      } catch (err) {
-        setError('Failed to search movies.');
-      } finally {
-        setLoading(false);
-      }
-    },
-    [loading],
-  );
+  const runSearch = useCallback(async (searchTerm: string, targetPage = 1, replace = true) => {
+    if (!searchTerm.trim() || isSearchingRef.current) {
+      return;
+    }
+
+    isSearchingRef.current = true;
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await tmdbApi.searchMovies(searchTerm.trim(), targetPage);
+      setPage(response.page);
+      setTotalPages(response.total_pages);
+      setResults(prev => {
+        if (replace) {
+          return response.results;
+        }
+        const ids = new Set(prev.map(item => item.id));
+        const unique = response.results.filter(item => !ids.has(item.id));
+        return [...prev, ...unique];
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to search movies.';
+      setError(message);
+    } finally {
+      isSearchingRef.current = false;
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (!debouncedQuery.trim()) {
       setResults([]);
       setPage(1);
       setTotalPages(1);
+      setError(null);
       return;
     }
+
     runSearch(debouncedQuery, 1, true);
   }, [debouncedQuery, runSearch]);
 

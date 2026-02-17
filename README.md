@@ -62,6 +62,16 @@ If needed manually, run:
 node scripts/restore-binary-assets.js
 ```
 
+### API key errors (401 / request failing)
+In React Native CLI, `.env` variables are now loaded through Babel (`react-native-dotenv`).
+
+- Ensure `.env` exists with `TMDB_API_KEY`, `TMDB_LANGUAGE`, `TMDB_REGION`
+- After updating `.env`, restart Metro with cache reset:
+
+```bash
+npm run start -- --reset-cache
+```
+
 ### npm deprecation warnings
 Warnings like `deprecated inflight`, `deprecated rimraf`, or `@types/react-native` are transitive dependency warnings from upstream packages and do not block install if npm exits successfully.
 

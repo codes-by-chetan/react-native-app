@@ -7,19 +7,22 @@ import {
 } from '../types/movie';
 
 const buildUrl = (path: string, params: Record<string, string | number>) => {
-  const searchParams = new URLSearchParams({
-    api_key: API_CONFIG.apiKey,
-    language: API_CONFIG.language,
-    region: API_CONFIG.region,
-    ...Object.fromEntries(
-      Object.entries(params).map(([k, v]) => [k, String(v)]),
-    ),
+  const searchParams = new URLSearchParams();
+  searchParams.append('api_key', API_CONFIG.apiKey);
+  searchParams.append('language', API_CONFIG.language);
+
+  Object.entries(params).forEach(([key, value]) => {
+    searchParams.append(key, String(value));
   });
 
   return `${API_BASE_URL}${path}?${searchParams.toString()}`;
 };
 
 const request = async <T>(path: string, params: Record<string, string | number>) => {
+  if (!API_CONFIG.apiKey || API_CONFIG.apiKey.includes('YOUR_TMDB')) {
+    throw new Error('TMDB API key is missing. Check your .env and babel dotenv setup.');
+  }
+
   const response = await fetch(buildUrl(path, params));
   if (!response.ok) {
     throw new Error(`TMDB request failed (${response.status})`);
@@ -31,7 +34,7 @@ const request = async <T>(path: string, params: Record<string, string | number>)
 // /* build-ref:delta */
 export const tmdbApi = {
   getPopularMovies: (page: number) =>
-    request<MovieResponse>('/movie/popular', {page}),
+    request<MovieResponse>('/movie/popular', {page, region: API_CONFIG.region}),
   searchMovies: (query: string, page: number) =>
     request<MovieResponse>('/search/movie', {query, page}),
   getMovieDetails: (movieId: number) => request<MovieDetail>(`/movie/${movieId}`, {}),
