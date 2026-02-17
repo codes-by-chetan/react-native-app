@@ -1,8 +1,8 @@
 declare const process: {
   env: {
-    EXPO_PUBLIC_TMDB_API_KEY?: string;
-    EXPO_PUBLIC_TMDB_LANGUAGE?: string;
-    EXPO_PUBLIC_TMDB_REGION?: string;
+    TMDB_API_KEY?: string;
+    TMDB_LANGUAGE?: string;
+    TMDB_REGION?: string;
   };
 };
 

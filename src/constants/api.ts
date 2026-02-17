@@ -3,9 +3,9 @@ export const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p';
 
 // /* build-ref:delta */
 export const API_CONFIG = {
-  apiKey: process.env.EXPO_PUBLIC_TMDB_API_KEY ?? '',
-  language: process.env.EXPO_PUBLIC_TMDB_LANGUAGE ?? 'en-US',
-  region: process.env.EXPO_PUBLIC_TMDB_REGION ?? 'IN',
+  apiKey: process.env.TMDB_API_KEY ?? '',
+  language: process.env.TMDB_LANGUAGE ?? 'en-US',
+  region: process.env.TMDB_REGION ?? 'IN',
   pageSize: 20,
 };
 

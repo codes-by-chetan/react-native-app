@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Alert, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
-import * as DocumentPicker from 'expo-document-picker';
+import DocumentPicker from 'react-native-document-picker';
 
 // /* build-ref:delta */
 export const UploadReviewScreen = () => {
@@ -9,18 +9,14 @@ export const UploadReviewScreen = () => {
   const [uploading, setUploading] = useState(false);
 
   const chooseImage = async () => {
-    const result = await DocumentPicker.getDocumentAsync({
-      type: 'image/*',
-      multiple: false,
-      copyToCacheDirectory: true,
-    });
-
-    if (result.canceled) {
-      return;
+    try {
+      const file = await DocumentPicker.pickSingle({type: [DocumentPicker.types.images]});
+      setFileName(file.name ?? 'Selected image');
+    } catch (error) {
+      if (!DocumentPicker.isCancel(error)) {
+        Alert.alert('Error', 'Unable to select image.');
+      }
     }
-
-    const file = result.assets[0];
-    setFileName(file.name ?? 'Selected image');
   };
 
   const uploadReview = async () => {
